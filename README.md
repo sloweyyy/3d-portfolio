@@ -51,7 +51,7 @@ The old site served the source HTML directly from `main`. That HTML requested `/
 3. Run **Deploy portfolio to GitHub Pages** if it did not start automatically.
 4. Check the workflow and the live site at <https://sloweyyy.github.io/3d-portfolio/>.
 
-These publishing steps have not been run as part of the local redesign.
+The workflow deploys updates to `main` only after the browser checks pass.
 
 ## Model export
 
