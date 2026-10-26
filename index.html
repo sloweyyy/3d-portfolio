@@ -2,75 +2,88 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f5f3ed" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#101c1d" />
     <meta
       name="description"
-      content="Step into SloWey's studio. A playful 3D portfolio at the intersection of software, design, and curiosity."
+      content="A small world by SloWey. Explore an interactive creative studio where code, design, and curiosity live."
     />
-    <title>SloWey — A little space for big ideas</title>
+    <title>SloWey — A small world. An open mind.</title>
     <link rel="icon" type="image/svg+xml" href="./icon.svg" />
   </head>
-  <body>
+  <body class="night">
     <a class="skip-link" href="#work">Skip to selected work</a>
-    <header class="site-header shell">
+    <header class="site-header">
       <a class="wordmark" href="#home" aria-label="SloWey home"
-        >slowey<span>®</span></a
+        >slowey<span class="brand-star">✳</span></a
+      ><span class="header-caption"
+        >INDEPENDENT MIND.<br />INTERCONNECTED IDEAS.</span
       >
       <nav aria-label="Main navigation">
-        <a href="#work">Work</a><a href="#about">About</a
-        ><a href="#contact">Say hello <span aria-hidden="true">↗</span></a>
+        <a href="#work">Work <sup>02</sup></a
+        ><a href="#about">About</a><a href="#contact">Let’s talk ↗</a>
       </nav>
       <button
         class="theme-button"
         type="button"
-        aria-label="Switch to night mode"
-        aria-pressed="false"
+        aria-label="Switch to day mode"
+        aria-pressed="true"
       >
-        <span class="theme-icon" aria-hidden="true">☼</span
-        ><span class="theme-label">Daylight</span>
+        <span class="theme-icon" aria-hidden="true">☾</span
+        ><span class="theme-label">After hours</span>
       </button>
     </header>
-    <main>
-      <section class="hero shell" id="home" aria-labelledby="hero-title">
+    <main id="home">
+      <section class="world" aria-labelledby="hero-title">
+        <div class="world-coordinate">
+          <span class="status-dot"></span> A SMALL WORLD BY PHUC
+          <span class="coordinate-line"></span> EST. IN CURIOSITY
+        </div>
         <div class="hero-copy">
-          <p class="eyebrow">
-            <span class="status-dot"></span> A DEVELOPER WITH A DESIGNER’S EYE
-          </p>
-          <h1 id="hero-title">A little space<br />for <em>big ideas.</em></h1>
-          <p class="hero-description">
-            Hi, I’m Phuc. I build useful things, sweat the little details, and
-            make room for a little play.
-          </p>
-          <a class="button button-dark" href="#work"
-            >Explore my work <span aria-hidden="true">↗</span></a
-          >
-          <div class="hero-footnote">
-            <span class="tiny-cross" aria-hidden="true">✳</span
-            ><span>Code. Design. A healthy dose of curiosity.</span>
-          </div>
+          <p class="eyebrow">SOFTWARE / DESIGN / THE SPACE BETWEEN</p>
+          <h1 id="hero-title">
+            I make<br /><em>ideas</em><br />real<span class="title-period"
+              >.</span
+            >
+          </h1>
         </div>
         <div class="studio-panel">
-          <div class="scene-topline">
-            <span>THE CREATIVE CORNER</span
-            ><span class="scene-live"
-              ><span class="status-dot"></span> LIVE IN 3D</span
-            >
-          </div>
           <div
             class="scene-stage"
             role="img"
-            aria-label="An isometric creative studio with a desk, glowing monitor, chair, bookshelf, plants, and a small cat."
+            aria-label="An interactive creative studio. Drag to explore, discover the desk, or wake the studio cat."
           >
             <div class="scene-fallback">
-              <span aria-hidden="true">✳</span>
-              <p>
-                A little corner of the internet.<br />Built with care and
-                curiosity.
-              </p>
+              <span>✳</span>
+              <p>Creativity lives here.<br />Even when 3D takes a break.</p>
             </div>
             <canvas id="studio" aria-hidden="true"></canvas>
           </div>
+          <div class="scene-topline">
+            <span class="scene-live">● A LIVING LITTLE WORLD</span
+            ><span>DRAG TO LOOK AROUND</span>
+          </div>
+          <p class="scene-note" role="status" aria-live="polite"></p>
+        </div>
+        <div class="artist-note">
+          <span class="note-index">01 — INTRO</span>
+          <p>
+            Hi, I’m Phuc. Engineer by logic.<br />Designer by instinct.<br />A
+            little curious about everything.
+          </p>
+          <a class="explore-link" href="#work"
+            >Explore my work <span>↗</span></a
+          >
+        </div>
+        <a class="floating-label desk-label" href="#work"
+          ><span class="hotspot-dot"></span
+          ><span>WHERE IDEAS BECOME THINGS <b>Selected work ↗</b></span></a
+        >
+        <div class="world-stamp" aria-hidden="true">
+          <span>BUILT TO BE EXPLORED</span><strong>↘</strong
+          ><span>NOT JUST SCROLLED.</span>
+        </div>
+        <div class="world-controls">
           <div class="scene-views" role="group" aria-label="Explore the studio">
             <button type="button" data-view="studio" aria-pressed="true">
               01 <span>The studio</span></button
@@ -80,21 +93,29 @@
               03 <span>The resident</span>
             </button>
           </div>
-          <div class="scene-caption">
-            <span
-              ><span class="caption-dot"></span> Drag to explore the little
-              details.</span
-            ><button class="motion-button" type="button" aria-pressed="false">
-              Pause motion <span aria-hidden="true">Ⅱ</span>
-            </button>
+          <div class="resident-controls">
+            <button class="pet-button" type="button">
+              <span aria-hidden="true">♡</span> Wake the cat</button
+            ><span class="resident-status" aria-live="polite"
+              >Even the ideas need a nap.</span
+            >
           </div>
-          <p class="scene-note" role="status" aria-live="polite"></p>
         </div>
       </section>
-      <div class="section-divider shell">
-        <span>SCROLL A LITTLE. DISCOVER A LOT.</span
-        ><a href="#work" aria-label="Scroll to selected work">↓</a
-        ><span>BASED IN HO CHI MINH CITY, VIETNAM</span>
+    </main>
+    <div class="bottom-rail">
+      <span>HO CHI MINH CITY <span class="local-time"></span></span
+      ><span class="rail-center">A HUMAN BEHIND THE PIXELS.</span
+      ><button class="motion-button" type="button" aria-pressed="false">
+        Pause motion Ⅱ</button
+      ><span class="copyright">© <span id="year">2026</span> SLOWEY</span>
+    </div>
+    <dialog class="content-panel" id="work-panel" aria-labelledby="work-title">
+      <div class="panel-top">
+        <span>SLOWEY / WORK</span
+        ><button class="close-panel" type="button" aria-label="Close work">
+          BACK TO THE STUDIO <span>×</span>
+        </button>
       </div>
       <section
         class="work-section shell"
@@ -169,6 +190,18 @@
           >
         </div>
       </section>
+    </dialog>
+    <dialog
+      class="content-panel"
+      id="about-panel"
+      aria-labelledby="about-title"
+    >
+      <div class="panel-top">
+        <span>SLOWEY / ABOUT</span
+        ><button class="close-panel" type="button" aria-label="Close about">
+          BACK TO THE STUDIO <span>×</span>
+        </button>
+      </div>
       <section
         class="about-section shell"
         id="about"
@@ -194,6 +227,18 @@
           </div>
         </div>
       </section>
+    </dialog>
+    <dialog
+      class="content-panel"
+      id="contact-panel"
+      aria-labelledby="contact-title"
+    >
+      <div class="panel-top">
+        <span>SLOWEY / CONTACT</span
+        ><button class="close-panel" type="button" aria-label="Close contact">
+          BACK TO THE STUDIO <span>×</span>
+        </button>
+      </div>
       <section
         class="contact-section shell"
         id="contact"
@@ -231,12 +276,24 @@
           >
         </div>
       </section>
-    </main>
-    <footer class="shell">
-      <a class="wordmark" href="#home">slowey<span>®</span></a
-      ><span>Made with intention. And a little Three.js.</span
-      ><span>© <span id="year">2026</span> SloWey</span>
-    </footer>
+    </dialog>
+    <noscript
+      ><style>
+        .content-panel {
+          display: block;
+          position: relative;
+          inset: auto;
+          margin: 30px auto;
+          max-height: none;
+        }
+        .world {
+          min-height: 900px;
+        }
+        .bottom-rail {
+          position: relative;
+        }
+      </style></noscript
+    >
     <script type="module" src="./main.js"></script>
   </body>
 </html>

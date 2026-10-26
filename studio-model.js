@@ -549,6 +549,9 @@ export function createStudioModel() {
   const head = group("Tabby head", [0.15, 0.285, 0.17], cat);
   const skull = ball("Soft round head", 0.18, [0, 0, 0], "cat", head);
   skull.scale.set(1.08, 0.97, 0.92);
+  const sleepingEyes = [];
+  const awakeEyes = [];
+  const ears = [];
   for (const side of [-1, 1]) {
     const shape = new THREE.Shape();
     shape.moveTo(-0.072, 0);
@@ -570,6 +573,7 @@ export function createStudioModel() {
       head,
     );
     ear.rotation.z = -side * 0.12;
+    ears.push(ear);
     const inset = new THREE.Shape();
     inset.moveTo(-0.042, 0.023);
     inset.lineTo(0.042, 0.023);
@@ -590,17 +594,31 @@ export function createStudioModel() {
       head,
     );
     cheek.scale.set(1, 0.73, 0.62);
-    line(
-      "Closed sleeping eye",
-      [
-        [side * 0.115, 0.005, 0.132],
-        [side * 0.084, -0.009, 0.153],
-        [side * 0.051, 0.005, 0.161],
-      ],
-      0.008,
-      "dark",
-      head,
+    sleepingEyes.push(
+      line(
+        "Closed sleeping eye",
+        [
+          [side * 0.115, 0.005, 0.132],
+          [side * 0.084, -0.009, 0.153],
+          [side * 0.051, 0.005, 0.161],
+        ],
+        0.008,
+        "dark",
+        head,
+      ),
     );
+    const eye = group("Open emerald eye", [side * 0.083, 0.005, 0.15], head);
+    const irisMaterial = new THREE.MeshStandardMaterial({
+      color: "#84ab68",
+      roughness: 0.26,
+    });
+    const iris = ball("Emerald iris", 0.037, [0, 0, 0], irisMaterial, eye);
+    iris.scale.set(1, 1.1, 0.45);
+    const pupil = ball("Slit pupil", 0.024, [0, 0, 0.016], "dark", eye);
+    pupil.scale.set(0.3, 1.25, 0.3);
+    ball("Eye catchlight", 0.009, [-0.009, 0.013, 0.023], "cream", eye);
+    eye.visible = false;
+    awakeEyes.push(eye);
     line(
       "Cheek tabby marking",
       [
@@ -761,5 +779,13 @@ export function createStudioModel() {
     description:
       "Original procedural studio, built from editable named meshes. Units: metres.",
   };
-  return { model: room, cat, chair, lampLight, glow, screenGlow };
+  return {
+    model: room,
+    cat,
+    chair,
+    lampLight,
+    glow,
+    screenGlow,
+    catRig: { head, sleepingEyes, awakeEyes, ears },
+  };
 }

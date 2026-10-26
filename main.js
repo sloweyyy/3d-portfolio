@@ -6,7 +6,7 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 const darkPreference = window.matchMedia("(prefers-color-scheme: dark)");
 let studio;
 let paused = reducedMotion.matches;
-let night = darkPreference.matches;
+let night = true;
 try {
   const saved = localStorage.getItem("slowey-theme");
   if (saved === "night" || saved === "day") night = saved === "night";
@@ -23,11 +23,11 @@ function applyTheme() {
   );
   themeButton.querySelector(".theme-icon").textContent = night ? "☾" : "☼";
   themeButton.querySelector(".theme-label").textContent = night
-    ? "Moonlight"
-    : "Daylight";
+    ? "After hours"
+    : "Golden hour";
   document.querySelector('meta[name="theme-color"]').content = night
-    ? "#1d2c28"
-    : "#f5f3ed";
+    ? "#101c1d"
+    : "#e8e5d9";
   studio?.setNight(night);
 }
 function applyMotion() {
@@ -66,20 +66,66 @@ async function loadStudio() {
     document.querySelector(".scene-note").textContent =
       "3D is unavailable on this device. All projects and links are still ready to explore.";
     motionButton.disabled = true;
-    document.querySelectorAll("[data-view]").forEach((button) => {
+    document.querySelector(".pet-button").disabled = true;
+    document.querySelectorAll("button[data-view]").forEach((button) => {
       button.disabled = true;
     });
     document.querySelector(".scene-live").textContent = "THE QUIET CORNER";
   }
 }
-document.querySelectorAll("[data-view]").forEach((button) => {
+document.querySelectorAll("button[data-view]").forEach((button) => {
   button.addEventListener("click", () => {
     studio?.setView(button.dataset.view);
     document
-      .querySelectorAll("[data-view]")
+      .querySelectorAll("button[data-view]")
       .forEach((item) =>
         item.setAttribute("aria-pressed", String(item === button)),
       );
   });
 });
+document
+  .querySelector(".pet-button")
+  .addEventListener("click", () => studio?.petCat());
 loadStudio();
+
+// Deep links work with keyboard navigation, browser history, and direct URLs.
+function syncPanel() {
+  const section = location.hash.slice(1);
+  document.querySelectorAll(".content-panel").forEach((panel) => {
+    if (panel.id === section + "-panel") {
+      if (!panel.open) panel.showModal();
+    } else if (panel.open) panel.close();
+  });
+}
+window.addEventListener("hashchange", syncPanel);
+document.querySelectorAll(".content-panel").forEach((panel) => {
+  panel.querySelector(".close-panel").addEventListener("click", () => {
+    location.hash = "home";
+  });
+  panel.addEventListener("cancel", () => {
+    location.hash = "home";
+  });
+  panel.addEventListener("click", (event) => {
+    if (event.target === panel) {
+      const r = panel.getBoundingClientRect();
+      if (
+        event.clientX < r.left ||
+        event.clientX > r.right ||
+        event.clientY < r.top ||
+        event.clientY > r.bottom
+      )
+        location.hash = "home";
+    }
+  });
+});
+syncPanel();
+const clock = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "Asia/Ho_Chi_Minh",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+const tick = () =>
+  (document.querySelector(".local-time").textContent =
+    clock.format(new Date()) + " ICT");
+tick();
+setInterval(tick, 60000);

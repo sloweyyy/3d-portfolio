@@ -15,9 +15,7 @@ test("production page and 3D scene load without broken assets", async ({
   });
   await page.goto("./");
   await expect(page.locator("body")).toHaveClass(/scene-ready/);
-  await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "big ideas",
-  );
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("I make");
   await expect(page.locator("canvas")).toBeVisible();
   await page.getByRole("button", { name: "02 The desk" }).click();
   await expect(page.locator('[data-view="desk"]')).toHaveAttribute(
@@ -37,6 +35,8 @@ test("theme, motion, navigation, and saved preference work", async ({
 }) => {
   await page.goto("./");
   await expect(page.locator("body")).toHaveClass(/scene-ready/);
+  await page.getByRole("button", { name: "Switch to day mode" }).click();
+  await expect(page.locator("body")).not.toHaveClass(/night/);
   await page.getByRole("button", { name: "Switch to night mode" }).click();
   await expect(page.locator("body")).toHaveClass(/night/);
   await page.getByRole("button", { name: /Pause motion/ }).click();
@@ -71,6 +71,8 @@ test("phone layout has no sideways overflow and links stay accessible", async ({
   await expect(
     page.getByRole("heading", { name: /Equal parts logic/ }),
   ).toBeInViewport();
+  await page.keyboard.press("Escape");
+  await page.getByRole("link", { name: /Let’s talk/ }).click();
   await expect(page.getByRole("link", { name: "Email me" })).toHaveAttribute(
     "href",
     /^mailto:/,
@@ -126,4 +128,27 @@ test("touch users can scroll through the studio", async ({
   } finally {
     await context.close();
   }
+});
+
+test("project panels close with Escape and the resident reacts", async ({
+  page,
+}) => {
+  await page.goto("./");
+  await expect(page.locator("body")).toHaveClass(/scene-ready/);
+  await page.getByRole("link", { name: "Explore my work" }).click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: /Things I’ve put/ }),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  await page.getByRole("button", { name: /Wake the cat/ }).click();
+  await expect(page.getByRole("button", { name: /Pet the cat/ })).toBeVisible();
+  await expect(page.locator(".resident-status")).toContainText(
+    "You made a friend",
+  );
+  await expect(page.locator('[data-view="cat"]')).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
 });

@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { createStudioModel } from "./studio-model.js";
+import { Atmosphere } from "./atmosphere.js";
 
 export class Studio {
   constructor(canvas, { night = false, paused = false } = {}) {
@@ -69,6 +70,10 @@ export class Studio {
     ground.position.y = -0.325;
     ground.receiveShadow = true;
     this.scene.add(ground);
+    this.atmosphere = new Atmosphere(this.scene, this.model);
+    this.gaze = new THREE.Vector2();
+    this.awake = false;
+    this.addInteractions();
     this.addSignature();
     this.setNight(night);
     this.resize = this.resize.bind(this);
@@ -134,6 +139,7 @@ export class Studio {
   }
   setNight(night) {
     this.night = night;
+    this.atmosphere?.setNight(night);
     this.ambient.color.set(night ? "#a7b8d6" : "#fffae8");
     this.ambient.groundColor.set(night ? "#596e70" : "#829181");
     this.ambient.intensity = night ? 0.2 : 0.65;
@@ -149,16 +155,122 @@ export class Studio {
   }
   setView(view) {
     this.view = view;
+    document.body.dataset.cameraView = view;
     const views = {
       studio: { position: [7.3, 6.2, 8.6], target: [0, 1.1, 0] },
       desk: { position: [3.8, 3.4, 4.2], target: [0, 1.5, -0.8] },
       cat: { position: [0.3, 1.25, 3.35], target: [-0.9, 0.36, 1.43] },
     };
     const preset = views[view] || views.studio;
-    this.camera.position.set(...preset.position);
-    this.controls.target.set(...preset.target);
-    this.controls.update();
+    if (this.paused) {
+      this.camera.position.set(...preset.position);
+      this.controls.target.set(...preset.target);
+      this.controls.update();
+    } else {
+      this.cameraMove = {
+        start: performance.now(),
+        from: this.camera.position.clone(),
+        targetFrom: this.controls.target.clone(),
+        to: new THREE.Vector3(...preset.position),
+        targetTo: new THREE.Vector3(...preset.target),
+      };
+    }
     this.render();
+  }
+  addInteractions() {
+    this.canvas.addEventListener("pointermove", (event) => {
+      const rect = this.canvas.getBoundingClientRect();
+      this.gaze.set(
+        ((event.clientX - rect.left) / rect.width) * 2 - 1,
+        ((event.clientY - rect.top) / rect.height) * 2 - 1,
+      );
+    });
+    this.canvas.addEventListener("pointerleave", () => this.gaze.set(0, 0));
+    let down;
+    this.canvas.addEventListener("pointerdown", (e) => {
+      down = { x: e.clientX, y: e.clientY };
+      this.cameraMove = null;
+    });
+    this.canvas.addEventListener("pointerup", (e) => {
+      if (!down || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 6)
+        return;
+      const rect = this.canvas.getBoundingClientRect();
+      const ray = new THREE.Raycaster();
+      ray.setFromCamera(
+        new THREE.Vector2(
+          ((e.clientX - rect.left) / rect.width) * 2 - 1,
+          (-(e.clientY - rect.top) / rect.height) * 2 + 1,
+        ),
+        this.camera,
+      );
+      if (ray.intersectObject(this.cat, true).length) this.petCat();
+    });
+  }
+  petCat() {
+    this.awake = true;
+    this.lastPet = this.elapsed;
+    this.catRig.sleepingEyes.forEach((eye) => (eye.visible = false));
+    this.catRig.awakeEyes.forEach((eye) => (eye.visible = true));
+    this.catRig.head.position.y = 0.32;
+    document.querySelector(".pet-button").innerHTML =
+      '<span aria-hidden="true">♡</span> Pet the cat';
+    document.querySelector(".resident-status").textContent =
+      "You made a friend. Move your pointer — you have an audience.";
+    if (this.view !== "cat") {
+      this.setView("cat");
+      document
+        .querySelectorAll("button[data-view]")
+        .forEach((button) =>
+          button.setAttribute(
+            "aria-pressed",
+            String(button.dataset.view === "cat"),
+          ),
+        );
+    }
+    this.atmosphere.love(this.elapsed, this.cat, this.paused);
+    this.atmosphere.hearts.forEach((heart) =>
+      heart.quaternion.copy(this.camera.quaternion),
+    );
+    this.render();
+  }
+  updateLife() {
+    if (this.cameraMove) {
+      const t = Math.min(1, (performance.now() - this.cameraMove.start) / 1100);
+      const ease = t * t * (3 - 2 * t);
+      this.camera.position.lerpVectors(
+        this.cameraMove.from,
+        this.cameraMove.to,
+        ease,
+      );
+      this.controls.target.lerpVectors(
+        this.cameraMove.targetFrom,
+        this.cameraMove.targetTo,
+        ease,
+      );
+      this.controls.update();
+      if (t === 1) this.cameraMove = null;
+    }
+    if (this.awake) {
+      this.catRig.head.rotation.y = THREE.MathUtils.lerp(
+        this.catRig.head.rotation.y,
+        this.gaze.x * 0.3,
+        0.08,
+      );
+      this.catRig.head.rotation.x = THREE.MathUtils.lerp(
+        this.catRig.head.rotation.x,
+        this.gaze.y * 0.12,
+        0.08,
+      );
+      const blink = Math.sin(this.elapsed * 0.8) > 0.996;
+      this.catRig.awakeEyes.forEach((eye) => (eye.scale.y = blink ? 0.08 : 1));
+      this.catRig.ears.forEach(
+        (ear, i) =>
+          (ear.rotation.z =
+            -(i === 0 ? -1 : 1) * 0.12 +
+            Math.sin(this.elapsed * 1.7 + i) * 0.035),
+      );
+    }
+    this.atmosphere.update(this.elapsed, this.camera);
   }
   setPaused(paused) {
     this.paused = paused;
@@ -183,6 +295,7 @@ export class Studio {
         : Math.min((time - this.lastTime) / 1000, 0.05);
     this.lastTime = time;
     this.elapsed += delta;
+    this.updateLife();
     this.cat.scale.y = 1 + Math.sin(this.elapsed * 1.5) * 0.025;
     this.model.position.y = Math.sin(this.elapsed * 0.65) * 0.018;
     this.render();

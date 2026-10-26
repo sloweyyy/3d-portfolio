@@ -1,6 +1,8 @@
 # SloWey / The Creative Corner
 
-An original, interactive 3D studio and personal portfolio. Built with Three.js and Vite.
+An original, full-screen 3D studio and personal portfolio. Built with Three.js and Vite.
+
+The interface uses an immersive world with deep-linked native dialogs for Work, About, and Contact. Escape returns to the studio. The default after-hours palette can switch to golden hour. The cat wakes, follows the pointer, blinks, and reacts to pets. `atmosphere.js` adds window light shafts, drifting motes, and floating hearts. Camera transitions respect the motion toggle and reduced-motion preferences.
 
 ## Run locally
 
