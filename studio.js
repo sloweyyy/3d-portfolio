@@ -152,7 +152,7 @@ export class Studio {
     const views = {
       studio: { position: [7.3, 6.2, 8.6], target: [0, 1.1, 0] },
       desk: { position: [3.8, 3.4, 4.2], target: [0, 1.5, -0.8] },
-      cat: { position: [0.8, 1.8, 3.8], target: [-0.7, 0.35, 1.1] },
+      cat: { position: [0.3, 1.25, 3.35], target: [-0.9, 0.36, 1.43] },
     };
     const preset = views[view] || views.studio;
     this.camera.position.set(...preset.position);

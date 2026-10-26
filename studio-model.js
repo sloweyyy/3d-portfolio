@@ -22,7 +22,9 @@ export function createStudioModel() {
     blue: "#849d9f",
     paper: "#ede6cf",
     soil: "#5b4436",
-    cat: "#dfaa68",
+    cat: "#c17c45",
+    catStripe: "#8a4c2c",
+    catPink: "#d38b83",
   };
   const materials = Object.fromEntries(
     Object.entries(palette).map(([name, color]) => [
@@ -517,64 +519,222 @@ export function createStudioModel() {
     "blue",
     stool,
   ).rotation.y = 0.2;
-  // A sleeping cat with individually modelled ears, muzzle, paws, and curved tail.
+  // A complete curled tabby: connected limbs, sculpted ears, and a readable face.
   const cat = group("Studio_cat", [-0.98, 0.12, 1.3]);
-  cat.rotation.y = 0.5;
-  const body = ball("Curled body", 0.28, [0, 0.16, 0], "cat", cat);
-  body.scale.set(1.25, 0.65, 0.85);
-  const head = ball("Head", 0.17, [0.25, 0.2, 0.08], "cat", cat);
-  head.scale.set(1, 0.9, 0.9);
-  for (const x of [0.16, 0.34]) {
-    const ear = mesh(
-      "Pointed ear",
-      new THREE.ConeGeometry(0.085, 0.15, 3),
-      "cat",
-      [x, 0.35, 0.06],
-      cat,
-    );
-    ear.rotation.y = 0.45;
-  }
-  const muzzle = ball("Cream muzzle", 0.065, [0.29, 0.17, 0.2], "cream", cat);
-  muzzle.scale.set(1.2, 0.7, 0.6);
-  line(
-    "Sleeping left eye",
-    [
-      [0.19, 0.235, 0.195],
-      [0.215, 0.225, 0.212],
-      [0.24, 0.235, 0.218],
-    ],
-    0.009,
-    "dark",
-    cat,
-  );
-  line(
-    "Sleeping right eye",
-    [
-      [0.29, 0.235, 0.218],
-      [0.315, 0.225, 0.212],
-      [0.34, 0.235, 0.195],
-    ],
-    0.009,
-    "dark",
-    cat,
-  );
-  ball("Nose", 0.018, [0.29, 0.19, 0.238], "pink", cat);
-  for (let x of [0.08, 0.2]) {
-    const paw = ball("Front paw", 0.075, [x, 0.075, 0.23], "cream", cat);
-    paw.scale.set(1, 0.5, 0.9);
-  }
-  line(
-    "Curled tail",
-    [
-      [-0.25, 0.15, -0.12],
-      [-0.37, 0.1, 0.02],
-      [-0.28, 0.08, 0.25],
-      [-0.04, 0.08, 0.28],
-    ],
-    0.065,
+  cat.rotation.y = -0.3;
+  const body = ball(
+    "Rounded tabby torso",
+    0.3,
+    [-0.07, 0.19, -0.025],
     "cat",
     cat,
   );
+  body.scale.set(1.18, 0.72, 0.86);
+  const haunch = ball(
+    "Folded hindquarters",
+    0.2,
+    [-0.23, 0.16, 0.01],
+    "cat",
+    cat,
+  );
+  haunch.scale.set(0.95, 0.8, 1);
+  const chest = ball(
+    "Cream chest bib",
+    0.13,
+    [0.18, 0.145, 0.18],
+    "cream",
+    cat,
+  );
+  chest.scale.set(0.88, 1, 0.8);
+  const head = group("Tabby head", [0.15, 0.285, 0.17], cat);
+  const skull = ball("Soft round head", 0.18, [0, 0, 0], "cat", head);
+  skull.scale.set(1.08, 0.97, 0.92);
+  for (const side of [-1, 1]) {
+    const shape = new THREE.Shape();
+    shape.moveTo(-0.072, 0);
+    shape.lineTo(0.072, 0);
+    shape.lineTo(side * 0.025, 0.155);
+    shape.closePath();
+    const ear = mesh(
+      side < 0 ? "Left sculpted ear" : "Right sculpted ear",
+      new THREE.ExtrudeGeometry(shape, {
+        depth: 0.055,
+        bevelEnabled: true,
+        bevelSegments: 2,
+        steps: 1,
+        bevelSize: 0.009,
+        bevelThickness: 0.008,
+      }),
+      "cat",
+      [side * 0.112, 0.102, -0.015],
+      head,
+    );
+    ear.rotation.z = -side * 0.12;
+    const inset = new THREE.Shape();
+    inset.moveTo(-0.042, 0.023);
+    inset.lineTo(0.042, 0.023);
+    inset.lineTo(side * 0.017, 0.115);
+    inset.closePath();
+    mesh(
+      "Velvet inner ear",
+      new THREE.ShapeGeometry(inset),
+      "catPink",
+      [0, 0, 0.065],
+      ear,
+    );
+    const cheek = ball(
+      "Cream muzzle cheek",
+      0.058,
+      [side * 0.039, -0.057, 0.143],
+      "cream",
+      head,
+    );
+    cheek.scale.set(1, 0.73, 0.62);
+    line(
+      "Closed sleeping eye",
+      [
+        [side * 0.115, 0.005, 0.132],
+        [side * 0.084, -0.009, 0.153],
+        [side * 0.051, 0.005, 0.161],
+      ],
+      0.008,
+      "dark",
+      head,
+    );
+    line(
+      "Cheek tabby marking",
+      [
+        [side * 0.158, -0.005, 0.087],
+        [side * 0.145, -0.03, 0.106],
+        [side * 0.127, -0.043, 0.12],
+      ],
+      0.012,
+      "catStripe",
+      head,
+    );
+    for (let i = 0; i < 3; i++) {
+      line(
+        "Fine whisker",
+        [
+          [side * 0.062, -0.055 - i * 0.012, 0.174],
+          [side * 0.139, -0.047 - i * 0.02, 0.18],
+          [side * 0.205, -0.031 - i * 0.03, 0.167],
+        ],
+        0.0022,
+        "cream",
+        head,
+      );
+    }
+  }
+  const nose = new THREE.Shape();
+  nose.moveTo(-0.021, 0.009);
+  nose.lineTo(0.021, 0.009);
+  nose.lineTo(0, -0.015);
+  nose.closePath();
+  mesh(
+    "Rosy triangular nose",
+    new THREE.ShapeGeometry(nose),
+    "catPink",
+    [0, -0.038, 0.18],
+    head,
+  );
+  line(
+    "Muzzle centre",
+    [
+      [0, -0.051, 0.181],
+      [0, -0.073, 0.179],
+    ],
+    0.003,
+    "catStripe",
+    head,
+  );
+  for (const side of [-1, 1])
+    line(
+      "Sleepy smile",
+      [
+        [0, -0.073, 0.179],
+        [side * 0.012, -0.082, 0.177],
+        [side * 0.024, -0.076, 0.174],
+      ],
+      0.003,
+      "catStripe",
+      head,
+    );
+  for (const x of [-0.055, 0, 0.055])
+    line(
+      "Forehead tabby stripe",
+      [
+        [x, 0.135, 0.068],
+        [x * 0.85, 0.104, 0.119],
+        [x * 0.7, 0.071, 0.145],
+      ],
+      0.011,
+      "catStripe",
+      head,
+    );
+  for (const [index, x] of [0.075, 0.26].entries()) {
+    const leg = ball(
+      "Tucked front leg " + index,
+      0.085,
+      [x, 0.11, 0.23],
+      "cat",
+      cat,
+    );
+    leg.scale.set(0.8, 0.8, 1.3);
+    const paw = ball(
+      "Cream front paw " + index,
+      0.078,
+      [x, 0.075, 0.305],
+      "cream",
+      cat,
+    );
+    paw.scale.set(0.9, 0.6, 1.1);
+    for (const offset of [-0.021, 0.021])
+      line(
+        "Toe crease",
+        [
+          [x + offset, 0.098, 0.366],
+          [x + offset, 0.072, 0.378],
+        ],
+        0.0025,
+        "catStripe",
+        cat,
+      );
+  }
+  for (const z of [-0.1, 0.16]) {
+    const paw = ball("Tucked hind paw", 0.085, [-0.26, 0.075, z], "cream", cat);
+    paw.scale.set(1.1, 0.6, 0.8);
+  }
+  const tailPoints = [
+    [-0.28, 0.19, -0.13],
+    [-0.43, 0.12, -0.02],
+    [-0.4, 0.085, 0.22],
+    [-0.24, 0.075, 0.32],
+    [-0.08, 0.08, 0.28],
+  ];
+  line("Full curled tail", tailPoints, 0.057, "cat", cat);
+  const tailTip = ball(
+    "Cream tail tip",
+    0.058,
+    [-0.08, 0.08, 0.28],
+    "cream",
+    cat,
+  );
+  tailTip.scale.set(1.2, 0.9, 1);
+  for (let i = 0; i < 3; i++) {
+    const x = -0.24 + i * 0.1;
+    line(
+      "Back tabby stripe " + i,
+      [
+        [x, 0.368, -0.045],
+        [x - 0.025, 0.348, 0.055],
+        [x - 0.035, 0.3, 0.13],
+      ],
+      0.016,
+      "catStripe",
+      cat,
+    );
+  }
   // A wall sign and mini pinboard create a recognisable personal space.
   const board = group("Pinboard", [0.65, 2.52, -2.02]);
   box("Cork backing", [0.6, 0.52, 0.045], [0, 0, 0], "oak", board);
